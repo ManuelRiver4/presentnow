@@ -27,16 +27,35 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   double progress = 0.0;
   late AnimationController progressController;
   Color barColor = Colors.blue;
-  List<Color> materiaColors = [Colors.blue, Colors.blue, Colors.blue];
+  List<Color> materiaColors = [
+    Colors.blue,
+    Colors.blue,
+    Colors.blue,
+    Colors.blue,
+    Colors.blue,
+    Colors.blue
+  ];
   List<String> materiaTimes = [
     "08:00 AM",
     "09:00 AM",
-    "10:00 AM"
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "01:00 PM"
   ]; // Horas personalizadas para cada materia
 
-  List<String> materias = ["Materia 1", "Materia 2", "Materia 3"];
+  List<String> materias = [
+    "Materia 1",
+    "Materia 2",
+    "Materia 3",
+    "Materia 4",
+    "Materia 5",
+    "Materia 6"
+  ];
   bool showAttendance = false;
   bool daySaved = false;
+  bool attendanceButtonDisabled =
+      false; // Variable para controlar si el botón de asistencia está bloqueado
 
   @override
   void initState() {
@@ -73,6 +92,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           daySaved = true;
           saveDay();
         }
+
+        // Activar el botón de asistencia después de que cambie la hora
+        setState(() {
+          attendanceButtonDisabled = false;
+        });
       } else {
         daySaved = false; // Restablecer la bandera para guardar el día
       }
@@ -91,27 +115,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
     // Actualizar el índice de la materia actual según la hora del día
     int hour = DateTime.now().hour;
-    if (hour == 8 && currentMinute >= 0 && currentMinute <= 15) {
-      currentMateriaIndex = 0;
-    } else if (hour == 9 && currentMinute >= 0 && currentMinute <= 15) {
-      currentMateriaIndex = 1;
-    } else if (hour == 10 && currentMinute >= 0 && currentMinute <= 15) {
-      currentMateriaIndex = 2;
+    if (hour >= 8 && hour <= 13) {
+      currentMateriaIndex = hour - 8;
     } else {
       currentMateriaIndex = -1; // Fuera del horario de las materias
     }
 
     // Verificar si el horario actual está dentro del rango de alguna materia
     if (currentMateriaIndex >= 0 && currentMateriaIndex < materias.length) {
-      if (currentMinute >= 15 && currentMinute < 20) {
-        barColor = Colors.yellow;
-        materiaColors[currentMateriaIndex] = Colors.yellow;
-      } else if (currentMinute >= 20 && currentMinute < 40) {
-        barColor = Colors.red;
-        materiaColors[currentMateriaIndex] = Colors.red;
-      } else if (currentMinute <= 15) {
+      if (currentMinute < 15) {
         barColor = Colors.green;
         materiaColors[currentMateriaIndex] = Colors.green;
+      } else if (currentMinute >= 15 && currentMinute <= 20) {
+        barColor = Colors.yellow; // Cambiado a amarillo en lugar de azul
+        materiaColors[currentMateriaIndex] = Colors.yellow;
+      } else if (currentMinute > 20 && currentMinute < 60) {
+        barColor = Colors.red;
+        materiaColors[currentMateriaIndex] = Colors.red;
       } else {
         barColor = Colors.blue; // Restablecer a azul fuera del rango de tiempo
         materiaColors[currentMateriaIndex] = Colors.blue;
@@ -225,6 +245,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Text(
+                    currentDate,
+                    style: TextStyle(fontSize: 20.0),
+                  ),
+                  Spacer(),
+                  Text(currentTime),
+                ],
+              ),
+              SizedBox(height: 10.0),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -253,11 +284,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ),
               ),
               SizedBox(height: 10.0),
-              if (showAttendance && currentMateriaIndex >= 0)
+              if (currentMateriaIndex >= 0 && showAttendance)
                 Container(
                   color: currentMateriaIndex < materias.length
-                      ? materiaColors[
-                          currentMateriaIndex] // Color de fondo según la materia actual
+                      ? materiaColors[currentMateriaIndex]
                       : Colors.grey,
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -266,79 +296,97 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         : 'Todavía no ha comenzado el día',
                     style: TextStyle(
                       fontSize: 20.0,
-                      color: Colors.black, // Texto de la materia en negro
+                      color: Colors.black,
                     ),
                   ),
                 ),
               SizedBox(height: 10.0),
               Row(
                 children: [
-                  Text(currentTime),
-                  Spacer(),
                   ElevatedButton(
                     onPressed: () {
-                      // Calcular el progreso y actualizar los colores de las materias
-                      calculateProgress();
+                      if (attendanceButtonDisabled) return;
 
-                      // Verificar el intervalo de tiempo y actualizar los colores de las materias
-                      if (DateTime.now().minute <= 15 &&
-                          currentMateriaIndex >= 0) {
-                        // Cambiar el color de la barra y el recuadro de la materia a verde
+                      if (showAttendance) {
+                        // Si ya se ha registrado la asistencia, cambiar el color de la materia a azul
                         setState(() {
-                          materiaColors[currentMateriaIndex] = Colors.green;
-                          showAttendance = true;
+                          materiaColors[currentMateriaIndex] = Colors.blue;
+                          showAttendance = false;
                         });
-                        // Mostrar mensaje de éxito en el registro de asistencia con retraso de 2 segundos
-                        Future.delayed(Duration(seconds: 2), () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Éxito en registrar asistencia'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        });
-                      } else if (DateTime.now().minute >= 15 &&
-                          DateTime.now().minute < 20 &&
-                          currentMateriaIndex >= 0) {
-                        // Cambiar el color de la barra y el recuadro de la materia a amarillo
-                        setState(() {
-                          materiaColors[currentMateriaIndex] = Colors.yellow;
-                          showAttendance = true;
-                        });
-                        // Mostrar mensaje de asistencia registrada con retraso de 2 segundos
-                        Future.delayed(Duration(seconds: 2), () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Asistencia registrada con retraso'),
-                              backgroundColor: Colors.yellow,
-                            ),
-                          );
-                        });
-                      } else if (DateTime.now().minute >= 20 &&
-                          DateTime.now().minute < 40 &&
-                          currentMateriaIndex >= 0) {
-                        // Cambiar el color de la barra y el recuadro de la materia a rojo
-                        setState(() {
-                          materiaColors[currentMateriaIndex] = Colors.red;
-                          showAttendance = true;
-                        });
-                        // Mostrar mensaje de error en el registro de asistencia con retraso de 2 segundos
-                        Future.delayed(Duration(seconds: 2), () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error al registrar asistencia'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        });
+                      } else {
+                        // Código existente para registrar la asistencia
+                        if (!showAttendance) {
+                          // Calcular el progreso y actualizar los colores de las materias
+                          calculateProgress();
+
+                          // Verificar el intervalo de tiempo y actualizar los colores de las materias
+                          if (DateTime.now().minute <= 15 &&
+                              currentMateriaIndex >= 0) {
+                            // Cambiar el color de la barra y el recuadro de la materia a verde
+                            setState(() {
+                              materiaColors[currentMateriaIndex] = Colors.green;
+                              showAttendance = true;
+                            });
+                            // Mostrar mensaje de éxito en el registro de asistencia con retraso de 2 segundos
+                            Future.delayed(Duration(seconds: 2), () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('Éxito en registrar asistencia'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            });
+                          } else if (DateTime.now().minute > 15 &&
+                              DateTime.now().minute <= 20 &&
+                              currentMateriaIndex >= 0) {
+                            // Cambiar el color de la barra y el recuadro de la materia a amarillo
+                            setState(() {
+                              materiaColors[currentMateriaIndex] =
+                                  Colors.yellow;
+                              showAttendance = true;
+                            });
+                            // Mostrar mensaje de asistencia registrada con retraso de 2 segundos
+                            Future.delayed(Duration(seconds: 2), () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('Asistencia registrada con retraso'),
+                                  backgroundColor: Colors.yellow,
+                                ),
+                              );
+                            });
+                          } else if (DateTime.now().minute > 20 &&
+                              currentMateriaIndex >= 0) {
+                            // Cambiar el color de la barra y el recuadro de la materia a rojo
+                            setState(() {
+                              materiaColors[currentMateriaIndex] = Colors.red;
+                              showAttendance = true;
+                            });
+                            // Mostrar mensaje de error en el registro de asistencia con retraso de 2 segundos
+                            Future.delayed(Duration(seconds: 2), () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text('Error al registrar asistencia'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            });
+                          }
+
+                          // Desactivar el botón de asistencia después de hacer clic
+                          setState(() {
+                            attendanceButtonDisabled = true;
+                          });
+                        }
                       }
                     },
                     child: Container(
                       padding:
                           EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: showAttendance ? Colors.grey : Colors.blue,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
