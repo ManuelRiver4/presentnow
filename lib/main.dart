@@ -1,6 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'mis_archivos_screen.dart'; // Importa el archivo para la opción "Mis archivos"
+import 'charlar_screen.dart'; // Importa el archivo para la opción "Charlar"
+import 'materias_screen.dart'; // Importa el archivo para la opción "Materias"
+import 'avisos_screen.dart'; // Importa el archivo para la opción "Avisos recientes"
+import 'desconectado_screen.dart'; // Importa el archivo para la opción "Modo desconectado"
+import 'justificantes_screen.dart'; // Importa el archivo para la opción "Justificantes"
+import 'cerrar_sesion_screen.dart'; // Importa el archivo para la opción "Cerrar sesión"
 
 void main() {
   runApp(MyApp());
@@ -197,43 +204,65 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             ListTile(
               title: Text('Mis archivos'),
               onTap: () {
-                // Implementa la lógica para "Mis archivos"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MisArchivosScreen()),
+                );
               },
             ),
             ListTile(
               title: Text('Charlar'),
               onTap: () {
-                // Implementa la lógica para "Charlar"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CharlarScreen()),
+                );
               },
             ),
             ListTile(
               title: Text('Materias'),
               onTap: () {
-                // Implementa la lógica para "Materias"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MateriasScreen()),
+                );
               },
             ),
             ListTile(
               title: Text('Avisos recientes'),
               onTap: () {
-                // Implementa la lógica para "Avisos recientes"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AvisosScreen()),
+                );
               },
             ),
             ListTile(
               title: Text('Modo desconectado'),
               onTap: () {
-                // Implementa la lógica para "Modo desconectado"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DesconectadoScreen()),
+                );
               },
             ),
             ListTile(
               title: Text('Justificantes'),
               onTap: () {
-                // Implementa la lógica para "Justificantes"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => JustificantesScreen()),
+                );
               },
             ),
             ListTile(
               title: Text('Cerrar sesión'),
               onTap: () {
-                // Implementa la lógica para "Cerrar sesión"
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CerrarSesionScreen()),
+                );
               },
             ),
           ],
