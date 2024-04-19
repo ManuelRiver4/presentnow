@@ -5,7 +5,7 @@
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
-            android:exported="true" <!-- Se agrega android:exported="true" aquí -->
+            android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -41,4 +41,13 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+
+    <!-- Agregado el atributo android:exported="true" al receiver -->
+    <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+        </intent-filter>
+    </receiver>
 </manifest>
