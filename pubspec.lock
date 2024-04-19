@@ -86,6 +86,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_local_notifications:
+    dependency: "direct main"
+    description:
+      name: flutter_local_notifications
+      sha256: "8f407d97c50a6c0e44a5e9d7772e25137b1646ca246f2826e3b0ddd2255e7a26"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0-nullsafety.0"
+  flutter_local_notifications_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_platform_interface
+      sha256: "60a02e35c59420d8a4af29a722512adc3c544206adf0338e0dfa902b463bf8e8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -309,6 +325,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  timezone:
+    dependency: transitive
+    description:
+      name: timezone
+      sha256: f60f389b14643ee90a3ab96ae414f77b0472e3817b5b4bf5cc9ce81ec0113f78
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
   vector_math:
     dependency: transitive
     description:
