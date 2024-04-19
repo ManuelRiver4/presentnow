@@ -8,6 +8,7 @@ import 'avisos_screen.dart'; // Importa el archivo para la opción "Avisos recie
 import 'desconectado_screen.dart'; // Importa el archivo para la opción "Modo desconectado"
 import 'justificantes_screen.dart'; // Importa el archivo para la opción "Justificantes"
 import 'cerrar_sesion_screen.dart'; // Importa el archivo para la opción "Cerrar sesión"
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(MyApp());
@@ -159,6 +160,40 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void saveDay() {
     // Implementa aquí la lógica para guardar el día actual
     print('Día guardado: $currentDate');
+  }
+
+  void _getLocation() async {
+    // Verificar si el usuario ha otorgado permiso para acceder a la ubicación
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Si el servicio de ubicación no está habilitado, solicitar al usuario que lo habilite
+      bool serviceStatus = await Geolocator.openLocationSettings();
+      if (!serviceStatus) {
+        // El usuario no habilitó el servicio de ubicación, mostrar un mensaje o tomar otra acción según sea necesario
+        return;
+      }
+    }
+
+    // Verificar si se ha otorgado el permiso de ubicación
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      // Si el permiso de ubicación está denegado, solicitar al usuario que lo habilite
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // El usuario negó el permiso de ubicación, mostrar un mensaje o tomar otra acción según sea necesario
+        return;
+      }
+    }
+
+    // Obtener la ubicación actual
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    // Actualizar la interfaz de usuario con la ubicación obtenida
+    setState(() {
+      // Aquí puedes mostrar la ubicación en la interfaz de usuario
+      print('Ubicación actual: ${position.latitude}, ${position.longitude}');
+    });
   }
 
   @override
@@ -444,6 +479,37 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     },
                   ),
                 ],
+              ),
+              SizedBox(height: 20.0),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'GPS',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Ubicación actual: (COORDENADAS)',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed:
+                          _getLocation, // Llamar a la función para obtener la ubicación
+                      child: Text('Actualizar Ubicación'),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
