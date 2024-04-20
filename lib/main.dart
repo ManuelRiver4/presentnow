@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart'; // Importa la biblioteca url_launcher
+
 import 'mis_archivos_screen.dart'; // Importa el archivo para la opción "Mis archivos"
 import 'charlar_screen.dart'; // Importa el archivo para la opción "Charlar"
 import 'materias_screen.dart'; // Importa el archivo para la opción "Materias"
@@ -8,7 +11,6 @@ import 'avisos_screen.dart'; // Importa el archivo para la opción "Avisos recie
 import 'desconectado_screen.dart'; // Importa el archivo para la opción "Modo desconectado"
 import 'justificantes_screen.dart'; // Importa el archivo para la opción "Justificantes"
 import 'cerrar_sesion_screen.dart'; // Importa el archivo para la opción "Cerrar sesión"
-import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(MyApp());
@@ -191,8 +193,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
     // Actualizar la interfaz de usuario con la ubicación obtenida
     setState(() {
-      // Aquí puedes mostrar la ubicación en la interfaz de usuario
-      print('Ubicación actual: ${position.latitude}, ${position.longitude}');
+      // Mostrar las coordenadas en la interfaz de usuario
+      String coordinates = '${position.latitude}, ${position.longitude}';
+      print('Ubicación actual: $coordinates');
+      // Abrir Google Maps con las coordenadas
+      launch(
+          'https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}');
     });
   }
 
@@ -498,9 +504,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Text(
-                      'Ubicación actual: (COORDENADAS)',
-                      style: TextStyle(fontSize: 16),
+                    FutureBuilder(
+                      future: Geolocator.getCurrentPosition(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<Position> snapshot) {
+                        if (snapshot.hasData) {
+                          Position position = snapshot.data!;
+                          // Mostrar las coordenadas en la interfaz de usuario
+                          String coordinates =
+                              '${position.latitude}, ${position.longitude}';
+                          return Text(
+                            'Ubicación actual: $coordinates',
+                            style: TextStyle(fontSize: 16),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error al obtener la ubicación');
+                        } else {
+                          return Text('Obteniendo ubicación...');
+                        }
+                      },
                     ),
                     SizedBox(height: 10),
                     ElevatedButton(
